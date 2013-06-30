@@ -37,8 +37,6 @@ public class Board extends BaseBoard {
 
 		MiniBoard mB = new MiniBoard();
 		mB.from(tiles, mask, m);
-		//Log.d("kiki", "board index:" + mask.getBoardIndex(m));
-		//Log.d("kiki", mB.toString());
 		if (mB.isFinished()) {
 			switch (mask.getBoardIndex(m)) {
 			case Const.BOARD_TOP_LEFT:
@@ -71,15 +69,6 @@ public class Board extends BaseBoard {
 			default:
 				break;
 			}
-			// sa identific care board a fost terminat
-			// sa marchez pe miniboard
-
-			// System.out.println(m.toString());
-			// int xx = m.x % 3;
-			// int yy = m.y % 3;
-			// Move tmpMove = new Move(xx, yy, m.kind, m.time);
-			// System.out.println(tmpMove.toString());
-			// miniBoard.setTile(tmpMove);
 		}
 	}
 

@@ -31,18 +31,22 @@ import android.widget.Toast;
 
 public class Xando extends ZoomActivity {
 
+	public static final boolean DEBUG = true;
+
 	private static final int CAMERA_WIDTH = 720;
 	private static final int CAMERA_HEIGHT = 480;
 
 	private BitmapTextureAtlas mCardDeckTexture;
 	private Box[][] tiles;
-	private Box[][] miniBoard;
 
 	private Scene mScene;
 
 	private HashMap<Tile, ITextureRegion> mCardTotextureRegionMap;
 	private NP np;
 	private Rectangle allowedMask;
+
+	private String player1 = "kiki";
+	private String player2 = "felix";
 
 	@Override
 	public EngineOptions onCreateEngineOptions() {
@@ -92,8 +96,8 @@ public class Xando extends ZoomActivity {
 
 		try {
 			np = new NP();
-			np.join("kiki");
-			np.join("felix");
+			np.join(player1);
+			np.join(player2);
 			Log.d("kiki", np.getGame().getId());
 		} catch (JXoNpException e) {
 			log(e);
@@ -115,7 +119,6 @@ public class Xando extends ZoomActivity {
 		initBoardBackground();
 
 		tiles = new Box[9][9];
-		miniBoard = new Box[3][3];
 		redraw();
 
 		mScene.setBackground(new Background(1.0f, 1.0f, 1.0f));
@@ -134,9 +137,11 @@ public class Xando extends ZoomActivity {
 		allowedMask.setAlpha(0.3f);
 		allowedMask.setColor(0f, 1f, 0f);
 
-		addMarker(0, 0, 1f, 0f, 0f); //red
-		addMarker(64 * 8, 0, 0f, 1f, 0f); // green
-		addMarker(0, 64 * 8, 0f, 0f, 1f); // blue
+		if (DEBUG) {
+			addMarker(0, 0, 1f, 0f, 0f); // red
+			addMarker(64 * 8, 0, 0f, 1f, 0f); // green
+			addMarker(0, 64 * 8, 0f, 0f, 1f); // blue
+		}
 
 		mScene.attachChild(allowedMask);
 
@@ -208,9 +213,8 @@ public class Xando extends ZoomActivity {
 
 	public void refresh(int x, int y) {
 		try {
-			String name = np.getGame().getMoveCount() % 2 == 0 ? "kiki"
-					: "felix";
-			np.move(name, x, y);
+			String n = np.getGame().getMoveCount() % 2 == 0 ? player1 : player2;
+			np.move(n, x, y);
 			runOnUiThread(new Runnable() {
 
 				@Override
@@ -234,30 +238,6 @@ public class Xando extends ZoomActivity {
 					addTile(x, y, boardTiles[x][y]);
 					if (allowedMask != null) {
 						updateMask();
-					}
-				}
-			}
-		}
-
-		// TODO WTF IS THIS SHIT
-		int[][] miniBoardTiles = np.getMiniBoardTiles();
-		Log.d("kiki", np.getGame().getBoard().getMoves().getLastMove()
-				.toString());
-		Log.d("kiki", np.getGame().getBoard().getMiniBoard().toString());
-		for (int x = 0; x < 3; x++) {
-			for (int y = 0; y < 3; y++) {
-				if (miniBoardTiles[x][y] != Const.NONE) {
-					if (miniBoard[x][y] == null) {
-						ITextureRegion tR;
-						if (miniBoardTiles[x][y] == Const.X) {
-							tR = mCardTotextureRegionMap.get(Tile.DEFAULT_X_1);
-						} else {
-							tR = mCardTotextureRegionMap.get(Tile.DEFAULT_Y_1);
-						}
-						miniBoard[x][y] = new Box(0, 0, miniBoardTiles[x][y],
-								tR, getVertexBufferObjectManager(), null);
-						miniBoard[x][y].setScale(3f);
-						// mScene.attachChild(miniBoard[x][y]);
 					}
 				}
 			}
