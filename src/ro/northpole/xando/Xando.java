@@ -38,6 +38,8 @@ public class Xando extends ZoomActivity {
 
 	private BitmapTextureAtlas mCardDeckTexture;
 	private Box[][] tiles;
+	private Box[][] miniBoardX;
+	private Box[][] miniBoardO;
 
 	private Scene mScene;
 
@@ -119,6 +121,37 @@ public class Xando extends ZoomActivity {
 		initBoardBackground();
 
 		tiles = new Box[9][9];
+		miniBoardX = new Box[3][3];
+		miniBoardO = new Box[3][3];
+
+		// TODO
+		// it is late, clean this up tomorrow
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
+				Box b = new Box(i, j, Const.O,
+						mCardTotextureRegionMap.get(Tile.DEFAULT_X_3),
+						getVertexBufferObjectManager(), null);
+				b.setPosition(i * Tile.CARD_WIDTH * 3 + 64, j
+						* Tile.CARD_HEIGHT * 3 + 64);
+				b.setAlpha(0.8f);
+				b.setScale(3f);
+				b.setVisible(false);
+				mScene.attachChild(b);
+				miniBoardX[i][j] = b;
+
+				Box b2 = new Box(i, j, Const.O,
+						mCardTotextureRegionMap.get(Tile.DEFAULT_Y_3),
+						getVertexBufferObjectManager(), null);
+				b2.setPosition(i * Tile.CARD_WIDTH * 3 + 64, j
+						* Tile.CARD_HEIGHT * 3 + 64);
+				b2.setAlpha(0.8f);
+				b2.setScale(3f);
+				b2.setVisible(false);
+				mScene.attachChild(b2);
+				miniBoardO[i][j] = b2;
+			}
+		}
+
 		redraw();
 
 		mScene.setBackground(new Background(1.0f, 1.0f, 1.0f));
@@ -180,22 +213,18 @@ public class Xando extends ZoomActivity {
 		switch (kind) {
 		case Const.X:
 			float r = new Random().nextFloat();
-			if (r < 0.33f) {
+			if (r < 0.5f) {
 				tR = mCardTotextureRegionMap.get(Tile.DEFAULT_X_1);
-			} else if (0.33f < r && r < 0.66f) {
-				tR = mCardTotextureRegionMap.get(Tile.DEFAULT_X_2);
 			} else {
-				tR = mCardTotextureRegionMap.get(Tile.DEFAULT_X_3);
+				tR = mCardTotextureRegionMap.get(Tile.DEFAULT_X_2);
 			}
 			break;
 		case Const.O:
 			float r2 = new Random().nextFloat();
-			if (r2 < 0.33f) {
+			if (r2 < 0.5f) {
 				tR = mCardTotextureRegionMap.get(Tile.DEFAULT_Y_1);
-			} else if (0.33f < r2 && r2 < 0.66f) {
-				tR = mCardTotextureRegionMap.get(Tile.DEFAULT_Y_2);
 			} else {
-				tR = mCardTotextureRegionMap.get(Tile.DEFAULT_Y_3);
+				tR = mCardTotextureRegionMap.get(Tile.DEFAULT_Y_2);
 			}
 			break;
 		default:
@@ -239,6 +268,17 @@ public class Xando extends ZoomActivity {
 					if (allowedMask != null) {
 						updateMask();
 					}
+				}
+			}
+		}
+
+		int[][] miniBoardTiles = np.getMiniBoardTiles();
+		for (int x = 0; x < 3; x++) {
+			for (int y = 0; y < 3; y++) {
+				if (miniBoardTiles[x][y] == Const.X) {
+					miniBoardX[y][x].setVisible(true);
+				} else if (miniBoardTiles[x][y] == Const.O) {
+					miniBoardO[y][x].setVisible(true);
 				}
 			}
 		}
