@@ -36,7 +36,7 @@ public class NPTest {
 
 	@Test
 	public void testNP() throws IOException {
-		NP np = new NP();
+		NP np = new NP(true);
 		Game game = np.getGame();
 		assertFalse(game.isStarted());
 		assertFalse(game.isFinished());
@@ -44,9 +44,9 @@ public class NPTest {
 	
 	@Test
 	public void testNPId() throws JXoNpException, IOException {
-		String id = new NP().getGame().getId();
+		String id = new NP(true).getGame().getId();
 
-		NP np = new NP(id);
+		NP np = new NP(id, true);
 		Game game = np.getGame();
 		
 		String json = gson.toJson(game);
@@ -58,9 +58,9 @@ public class NPTest {
 	
 	@Test
 	public void testJoin() throws JXoNpException, IOException {
-		String id = new NP().getGame().getId();
+		String id = new NP(true).getGame().getId();
 		
-		NP np = new NP(id);
+		NP np = new NP(id, true);
 		np.join(Const.PLAYER1);
 		
 		String json = gson.toJson(np.getGame());
@@ -69,9 +69,9 @@ public class NPTest {
 	
 	@Test
 	public void testMove() throws JXoNpException, IOException, InterruptedException {
-		String id = new NP().getGame().getId();
+		String id = new NP(true).getGame().getId();
 		
-		NP np = new NP(id);
+		NP np = new NP(id, true);
 		np.join(Const.PLAYER1);
 		np.join(Const.PLAYER2);
 		

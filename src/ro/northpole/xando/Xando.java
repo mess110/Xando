@@ -26,9 +26,16 @@ import ro.northpole.jxonp.exceptions.JXoNpException;
 import ro.northpole.jxonp.util.Const;
 import ro.northpole.xando.models.Box;
 import ro.northpole.xando.models.Tile;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.widget.EditText;
 import android.widget.Toast;
 
+// TODO hardcore dry up this code
 public class Xando extends ZoomActivity {
 
 	public static final boolean DEBUG = true;
@@ -96,8 +103,12 @@ public class Xando extends ZoomActivity {
 			mCardTotextureRegionMap.put(card, cardTextureRegion);
 		}
 
+		newOfflineGame();
+	}
+
+	private void newOfflineGame() {
 		try {
-			np = new NP();
+			np = new NP(false);
 			np.join(player1);
 			np.join(player2);
 			Log.d("kiki", np.getGame().getId());
@@ -170,22 +181,81 @@ public class Xando extends ZoomActivity {
 		allowedMask.setAlpha(0.3f);
 		allowedMask.setColor(0f, 1f, 0f);
 
-		if (DEBUG) {
-			addMarker(0, 0, 1f, 0f, 0f); // red
-			addMarker(64 * 8, 0, 0f, 1f, 0f); // green
-			addMarker(0, 64 * 8, 0f, 0f, 1f); // blue
-		}
-
 		mScene.attachChild(allowedMask);
 
 		return mScene;
 	}
 
-	private void addMarker(int i, int j, float f, float g, float h) {
-		Rectangle marker = new Rectangle(i, j, 5, 5,
-				getVertexBufferObjectManager());
-		marker.setColor(f, g, h);
-		mScene.attachChild(marker);
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.main, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.new_game:
+			newOfflineGame();
+			runOnUpdateThread(new Runnable() {
+
+				@Override
+				public void run() {
+					//
+					for (int i = 0; i < 9; i++) {
+						for (int j = 0; j < 9; j++) {
+							if (tiles[i][j].getKind() != Const.NONE) {
+								mScene.detachChild(tiles[i][j]);
+								addTile(i, j, Const.NONE);
+							}
+						}
+					}
+					for (int i = 0; i < 3; i++) {
+						for (int j = 0; j < 3; j++) {
+							miniBoardX[i][j].setVisible(false);
+							miniBoardO[i][j].setVisible(false);
+						}
+					}
+					allowedMask.setPosition(0, 0);
+					allowedMask.setSize(9 * Tile.CARD_WIDTH,
+							9 * Tile.CARD_HEIGHT);
+				}
+			});
+			return true;
+		case R.id.action_settings:
+			AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+			alert.setTitle("");
+			alert.setMessage("Identify yourself");
+
+			// Set an EditText view to get user input
+			final EditText input = new EditText(this);
+			alert.setView(input);
+
+			alert.setPositiveButton("Yes",
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog,
+								int whichButton) {
+							String value = input.getText().toString();
+						}
+					});
+
+			alert.setNegativeButton("Nah",
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog,
+								int whichButton) {
+						}
+					});
+
+			alert.show();
+			return true;
+		case R.id.exit:
+			finish();
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
 	}
 
 	private void initBoardBackground() {
@@ -287,6 +357,9 @@ public class Xando extends ZoomActivity {
 	private void updateMask() {
 		if (np.getGame().isFinished()) {
 			allowedMask.setSize(0, 0);
+		} else if (np.getGame().getMoveCount() == 0) {
+			allowedMask.setPosition(0, 0);
+			allowedMask.setSize(9 * Tile.CARD_WIDTH, 9 * Tile.CARD_HEIGHT);
 		} else {
 			allowedMask.setSize(Tile.CARD_WIDTH * 3, Tile.CARD_HEIGHT * 3);
 

@@ -20,9 +20,10 @@ public class NPClient {
 
 	protected Gson gson;
 	protected JsonParser parser;
+	protected boolean online;
 
-	public NPClient() {
-		init();
+	public NPClient(boolean online) {
+		init(online);
 	}
 
 	protected JsonObject newGame() throws IOException {
@@ -76,7 +77,9 @@ public class NPClient {
 		}
 	}
 
-	private void init() {
+	private void init(boolean online) {
+		this.online = online;
+
 		GsonBuilder gsonBuilder = new GsonBuilder();
 		gsonBuilder.registerTypeAdapter(Game.class, new GameSerializer());
 		gsonBuilder.registerTypeAdapter(Game.class, new GameDeserializer());

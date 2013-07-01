@@ -26,44 +26,59 @@ public class NP extends NPClient {
 
 	private Game game;
 
-	public NP() throws IOException {
-		super();
-		JsonObject jsonGame = newGame();
-		game = gson.fromJson(jsonGame, Game.class);
+	public NP(boolean online) throws IOException {
+		super(online);
+		if (online) {
+			JsonObject jsonGame = newGame();
+			game = gson.fromJson(jsonGame, Game.class);
+		} else {
+			game = new Game();
+			game.setId("offline");
+		}
 	}
 
-	public NP(String id) throws JXoNpException, IOException {
-		super();
-		JsonObject jsonGame = getGame(id);
-		game = gson.fromJson(jsonGame, Game.class);
+	public NP(String id, boolean online) throws JXoNpException, IOException {
+		super(online);
+		if (online) {
+			JsonObject jsonGame = getGame(id);
+			game = gson.fromJson(jsonGame, Game.class);
+		} else {
+			game = new Game();
+			game.setId(id);
+		}
 	}
 
 	public void join(String name) throws JXoNpException, IOException {
 		boolean joined = game.join(name);
-		if (joined) {
+		if (online) {
+			if (joined) {
+				JsonObject jsonGame = updateGame(game);
+				game = gson.fromJson(jsonGame, Game.class);
+			}
+		}
+	}
+
+	public void move(String name, int x, int y) throws JXoNpException,
+			IOException {
+		game.move(name, x, y, Util.getTime());
+		if (online) {
 			JsonObject jsonGame = updateGame(game);
 			game = gson.fromJson(jsonGame, Game.class);
 		}
-	}
-	
-	public void move(String name, int x, int y) throws JXoNpException, IOException {
-		game.move(name, x, y, Util.getTime());
-		JsonObject jsonGame = updateGame(game);
-		game = gson.fromJson(jsonGame, Game.class);
 	}
 
 	public Game getGame() {
 		return game;
 	}
-	
+
 	public int[][] getBoardTiles() {
 		return game.getBoard().getBoardTiles();
 	}
-	
+
 	public int whosTurnIsIt() {
 		return game.whosTurnIsIt();
 	}
-	
+
 	public int[][] getMiniBoardTiles() {
 		return game.getBoard().getMiniBoard().getBoardTiles();
 	}
