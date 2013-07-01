@@ -6,5 +6,9 @@
     <string name="hello_world">hello world!</string>
     <string name="exit">exit</string>
     <string name="new_game">new game</string>
+    <string name="alert_tile"></string>
+    <string name="alert_message">identify yourself</string>
+    <string name="yes">yes</string>
+    <string name="no">no</string>
 
 </resources>

@@ -2,14 +2,12 @@ package ro.northpole.xando;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Random;
 
 import org.andengine.engine.camera.ZoomCamera;
 import org.andengine.engine.options.EngineOptions;
 import org.andengine.engine.options.ScreenOrientation;
 import org.andengine.engine.options.resolutionpolicy.FillResolutionPolicy;
 import org.andengine.entity.primitive.Line;
-import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.input.touch.controller.MultiTouch;
@@ -24,6 +22,7 @@ import org.andengine.opengl.texture.region.TextureRegionFactory;
 import ro.northpole.jxonp.NP;
 import ro.northpole.jxonp.exceptions.JXoNpException;
 import ro.northpole.jxonp.util.Const;
+import ro.northpole.xando.models.AllowedMask;
 import ro.northpole.xando.models.Box;
 import ro.northpole.xando.models.Tile;
 import android.app.AlertDialog;
@@ -35,7 +34,6 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
 
-// TODO hardcore dry up this code
 public class Xando extends ZoomActivity {
 
 	public static final boolean DEBUG = true;
@@ -52,7 +50,7 @@ public class Xando extends ZoomActivity {
 
 	private HashMap<Tile, ITextureRegion> mCardTotextureRegionMap;
 	private NP np;
-	private Rectangle allowedMask;
+	private AllowedMask allowedMask;
 
 	private String player1 = "kiki";
 	private String player2 = "felix";
@@ -124,6 +122,17 @@ public class Xando extends ZoomActivity {
 				.show();
 	}
 
+	private Box bigTile(int i, int j, int kind, Tile tile) {
+		Box b = new Box(i, j, Const.O, mCardTotextureRegionMap.get(tile),
+				getVertexBufferObjectManager(), null);
+		b.setPosition(i * Tile.CARD_WIDTH * 3 + 64, j * Tile.CARD_HEIGHT * 3
+				+ 64);
+		b.setAlpha(0.8f);
+		b.setScale(3f);
+		b.setVisible(false);
+		return b;
+	}
+
 	@Override
 	public Scene onCreateScene() {
 		mScene = new Scene();
@@ -135,29 +144,13 @@ public class Xando extends ZoomActivity {
 		miniBoardX = new Box[3][3];
 		miniBoardO = new Box[3][3];
 
-		// TODO
-		// it is late, clean this up tomorrow
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
-				Box b = new Box(i, j, Const.O,
-						mCardTotextureRegionMap.get(Tile.DEFAULT_X_3),
-						getVertexBufferObjectManager(), null);
-				b.setPosition(i * Tile.CARD_WIDTH * 3 + 64, j
-						* Tile.CARD_HEIGHT * 3 + 64);
-				b.setAlpha(0.8f);
-				b.setScale(3f);
-				b.setVisible(false);
+				Box b = bigTile(i, j, Const.X, Tile.DEFAULT_X_3);
 				mScene.attachChild(b);
 				miniBoardX[i][j] = b;
 
-				Box b2 = new Box(i, j, Const.O,
-						mCardTotextureRegionMap.get(Tile.DEFAULT_Y_3),
-						getVertexBufferObjectManager(), null);
-				b2.setPosition(i * Tile.CARD_WIDTH * 3 + 64, j
-						* Tile.CARD_HEIGHT * 3 + 64);
-				b2.setAlpha(0.8f);
-				b2.setScale(3f);
-				b2.setVisible(false);
+				Box b2 = bigTile(i, j, Const.O, Tile.DEFAULT_Y_3);
 				mScene.attachChild(b2);
 				miniBoardO[i][j] = b2;
 			}
@@ -176,10 +169,8 @@ public class Xando extends ZoomActivity {
 		mScene.setOnSceneTouchListener(this);
 		mScene.setTouchAreaBindingOnActionDownEnabled(true);
 
-		allowedMask = new Rectangle(0, 0, Tile.CARD_WIDTH * 9,
+		allowedMask = new AllowedMask(0, 0, Tile.CARD_WIDTH * 9,
 				Tile.CARD_HEIGHT * 9, this.getVertexBufferObjectManager());
-		allowedMask.setAlpha(0.3f);
-		allowedMask.setColor(0f, 1f, 0f);
 
 		mScene.attachChild(allowedMask);
 
@@ -202,53 +193,13 @@ public class Xando extends ZoomActivity {
 
 				@Override
 				public void run() {
-					//
-					for (int i = 0; i < 9; i++) {
-						for (int j = 0; j < 9; j++) {
-							if (tiles[i][j].getKind() != Const.NONE) {
-								mScene.detachChild(tiles[i][j]);
-								addTile(i, j, Const.NONE);
-							}
-						}
-					}
-					for (int i = 0; i < 3; i++) {
-						for (int j = 0; j < 3; j++) {
-							miniBoardX[i][j].setVisible(false);
-							miniBoardO[i][j].setVisible(false);
-						}
-					}
-					allowedMask.setPosition(0, 0);
-					allowedMask.setSize(9 * Tile.CARD_WIDTH,
-							9 * Tile.CARD_HEIGHT);
+					resetBoard();
+					allowedMask.setDefaultPositionAndSize();
 				}
 			});
 			return true;
-		case R.id.action_settings:
-			AlertDialog.Builder alert = new AlertDialog.Builder(this);
-
-			alert.setTitle("");
-			alert.setMessage("Identify yourself");
-
-			// Set an EditText view to get user input
-			final EditText input = new EditText(this);
-			alert.setView(input);
-
-			alert.setPositiveButton("Yes",
-					new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog,
-								int whichButton) {
-							String value = input.getText().toString();
-						}
-					});
-
-			alert.setNegativeButton("Nah",
-					new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog,
-								int whichButton) {
-						}
-					});
-
-			alert.show();
+		case R.id.name:
+			nameAlertDialog();
 			return true;
 		case R.id.exit:
 			finish();
@@ -258,15 +209,56 @@ public class Xando extends ZoomActivity {
 		}
 	}
 
+	private void nameAlertDialog() {
+		AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+		alert.setTitle(getString(R.string.alert_tile));
+		alert.setMessage(getString(R.string.alert_message));
+
+		final EditText input = new EditText(this);
+		alert.setView(input);
+
+		alert.setPositiveButton(getString(R.string.yes),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						String value = input.getText().toString();
+						Log.d("kiki", value);
+					}
+				});
+
+		alert.setNegativeButton(getString(R.string.no),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+					}
+				});
+
+		alert.show();
+	}
+
+	private void resetBoard() {
+		for (int i = 0; i < 9; i++) {
+			for (int j = 0; j < 9; j++) {
+				if (tiles[i][j].getKind() != Const.NONE) {
+					mScene.detachChild(tiles[i][j]);
+					addTile(i, j, Const.NONE);
+				}
+			}
+		}
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
+				miniBoardX[i][j].setVisible(false);
+				miniBoardO[i][j].setVisible(false);
+			}
+		}
+	}
+
 	private void initBoardBackground() {
-		addLine(0, Tile.CARD_HEIGHT * 3, Tile.CARD_WIDTH * 9,
-				Tile.CARD_HEIGHT * 3);
-		addLine(0, Tile.CARD_HEIGHT * 6, Tile.CARD_WIDTH * 9,
-				Tile.CARD_HEIGHT * 6);
-		addLine(Tile.CARD_WIDTH * 3, 0, Tile.CARD_WIDTH * 3,
-				Tile.CARD_HEIGHT * 9);
-		addLine(Tile.CARD_WIDTH * 6, 0, Tile.CARD_WIDTH * 6,
-				Tile.CARD_HEIGHT * 9);
+		int ch = Tile.CARD_HEIGHT;
+		int cw = Tile.CARD_WIDTH;
+		addLine(0, ch * 3, cw * 9, ch * 3);
+		addLine(0, ch * 6, cw * 9, ch * 6);
+		addLine(cw * 3, 0, cw * 3, ch * 9);
+		addLine(cw * 6, 0, cw * 6, ch * 9);
 	}
 
 	private void addLine(int pX1, int pY1, int pX2, int pY2) {
@@ -278,30 +270,7 @@ public class Xando extends ZoomActivity {
 	}
 
 	private void addTile(int x, int y, int kind) {
-		ITextureRegion tR;
-
-		switch (kind) {
-		case Const.X:
-			float r = new Random().nextFloat();
-			if (r < 0.5f) {
-				tR = mCardTotextureRegionMap.get(Tile.DEFAULT_X_1);
-			} else {
-				tR = mCardTotextureRegionMap.get(Tile.DEFAULT_X_2);
-			}
-			break;
-		case Const.O:
-			float r2 = new Random().nextFloat();
-			if (r2 < 0.5f) {
-				tR = mCardTotextureRegionMap.get(Tile.DEFAULT_Y_1);
-			} else {
-				tR = mCardTotextureRegionMap.get(Tile.DEFAULT_Y_2);
-			}
-			break;
-		default:
-			tR = mCardTotextureRegionMap.get(Tile.TILE_BG_1);
-			break;
-		}
-
+		ITextureRegion tR = mCardTotextureRegionMap.get(Tile.random(kind));
 		final Box tile = new Box(x, y, kind, tR,
 				getVertexBufferObjectManager(), this);
 		tiles[x][y] = tile;
@@ -336,7 +305,7 @@ public class Xando extends ZoomActivity {
 						|| tiles[x][y].getKind() != boardTiles[x][y]) {
 					addTile(x, y, boardTiles[x][y]);
 					if (allowedMask != null) {
-						updateMask();
+						allowedMask.update(np.getGame());
 					}
 				}
 			}
@@ -350,44 +319,6 @@ public class Xando extends ZoomActivity {
 				} else if (miniBoardTiles[x][y] == Const.O) {
 					miniBoardO[y][x].setVisible(true);
 				}
-			}
-		}
-	}
-
-	private void updateMask() {
-		if (np.getGame().isFinished()) {
-			allowedMask.setSize(0, 0);
-		} else if (np.getGame().getMoveCount() == 0) {
-			allowedMask.setPosition(0, 0);
-			allowedMask.setSize(9 * Tile.CARD_WIDTH, 9 * Tile.CARD_HEIGHT);
-		} else {
-			allowedMask.setSize(Tile.CARD_WIDTH * 3, Tile.CARD_HEIGHT * 3);
-
-			// this takes orientation into account
-			int i = np.getGame().getBoard().getAllowedBoard();
-			// TODO simplify this..
-			switch (i) {
-			case Const.BOARD_TOP_LEFT:
-			case Const.BOARD_TOP_MIDDLE:
-			case Const.BOARD_TOP_RIGHT:
-				allowedMask.setPosition(Tile.CARD_WIDTH * 0, Tile.CARD_HEIGHT
-						* 3 * (i % 3));
-				break;
-			case Const.BOARD_MIDDLE_LEFT:
-			case Const.BOARD_MIDDLE_MIDDLE:
-			case Const.BOARD_MIDDLE_RIGHT:
-				allowedMask.setPosition(Tile.CARD_WIDTH * 3, Tile.CARD_HEIGHT
-						* 3 * (i % 3));
-				break;
-			case Const.BOARD_BOTTOM_LEFT:
-			case Const.BOARD_BOTTOM_MIDDLE:
-			case Const.BOARD_BOTTOM_RIGHT:
-				allowedMask.setPosition(Tile.CARD_WIDTH * 6, Tile.CARD_HEIGHT
-						* 3 * (i % 3));
-				break;
-			default:
-				allowedMask.setSize(0, 0);
-				break;
 			}
 		}
 	}
