@@ -29,7 +29,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 public class Xando extends ZoomActivity {
 
@@ -42,6 +41,8 @@ public class Xando extends ZoomActivity {
 	private Box[][] tiles;
 	private Box[][] miniBoardX;
 	private Box[][] miniBoardO;
+	private Box turnX;
+	private Box turnO;
 
 	private Scene mScene;
 
@@ -106,17 +107,12 @@ public class Xando extends ZoomActivity {
 			np = new NP(false);
 			np.join(player1);
 			np.join(player2);
-			Log.d("kiki", np.getGame().getId());
+			Log.d("Xando Game Id", np.getGame().getId());
 		} catch (JXoNpException e) {
-			log(e);
+			// log(e);
 		} catch (IOException e) {
-			log(e);
+			// log(e);
 		}
-	}
-
-	private void log(Exception e) {
-		Toast.makeText(Xando.this, e.getLocalizedMessage(), Toast.LENGTH_LONG)
-				.show();
 	}
 
 	private Box bigTile(int i, int j, int kind, Tile tile) {
@@ -124,7 +120,7 @@ public class Xando extends ZoomActivity {
 				getVertexBufferObjectManager(), null);
 		b.setPosition(i * Tile.CARD_WIDTH * 3 + 64, j * Tile.CARD_HEIGHT * 3
 				+ 64);
-		b.setAlpha(0.8f);
+		b.setAlpha(0.85f);
 		b.setScale(3f);
 		b.setVisible(false);
 		return b;
@@ -140,6 +136,15 @@ public class Xando extends ZoomActivity {
 		tiles = new Box[9][9];
 		miniBoardX = new Box[3][3];
 		miniBoardO = new Box[3][3];
+
+		turnX = new Box(11, 4, Const.X,
+				mCardTotextureRegionMap.get(Tile.DEFAULT_X_1),
+				getVertexBufferObjectManager(), this);
+		mScene.attachChild(turnX);
+		turnO = new Box(11, 4, Const.O,
+				mCardTotextureRegionMap.get(Tile.DEFAULT_Y_1),
+				getVertexBufferObjectManager(), this);
+		mScene.attachChild(turnO);
 
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
@@ -230,7 +235,7 @@ public class Xando extends ZoomActivity {
 	}
 
 	private void addLine(int pX1, int pY1, int pX2, int pY2) {
-		final float lineWidth = 5;
+		final float lineWidth = 7;
 		final Line line = new Line(pX1, pY1, pX2, pY2, lineWidth,
 				getVertexBufferObjectManager());
 		line.setColor(0.0f, 0.0f, 0.0f);
@@ -247,9 +252,18 @@ public class Xando extends ZoomActivity {
 		mScene.registerTouchArea(tile);
 	}
 
+	private void updateTurn() {
+		boolean whosTurnIsItAnyway = np.getGame().whosTurnIsIt() == Const.X;
+		if (np.getGame().isFinished()) {
+			whosTurnIsItAnyway = !whosTurnIsItAnyway;
+		}
+		turnX.setVisible(whosTurnIsItAnyway);
+		turnO.setVisible(!whosTurnIsItAnyway);
+	}
+
 	public void refresh(int x, int y) {
+		String n = np.getGame().getMoveCount() % 2 == 0 ? player1 : player2;
 		try {
-			String n = np.getGame().getMoveCount() % 2 == 0 ? player1 : player2;
 			np.move(n, x, y);
 			runOnUiThread(new Runnable() {
 
@@ -266,6 +280,8 @@ public class Xando extends ZoomActivity {
 	}
 
 	private void redraw() {
+		updateTurn();
+
 		int[][] boardTiles = np.getBoardTiles();
 		for (int x = 0; x < 9; x++) {
 			for (int y = 0; y < 9; y++) {
