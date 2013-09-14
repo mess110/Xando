@@ -138,11 +138,11 @@ public class Xando extends ZoomActivity {
 		miniBoardO = new Box[3][3];
 
 		turnX = new Box(11, 4, Const.X,
-				mCardTotextureRegionMap.get(Tile.DEFAULT_X_1),
+				mCardTotextureRegionMap.get(Tile.DEFAULT_X_3),
 				getVertexBufferObjectManager(), this);
 		mScene.attachChild(turnX);
 		turnO = new Box(11, 4, Const.O,
-				mCardTotextureRegionMap.get(Tile.DEFAULT_Y_1),
+				mCardTotextureRegionMap.get(Tile.DEFAULT_Y_3),
 				getVertexBufferObjectManager(), this);
 		mScene.attachChild(turnO);
 
@@ -209,6 +209,7 @@ public class Xando extends ZoomActivity {
 	}
 
 	private void resetBoard() {
+		updateTurn();
 		for (int i = 0; i < 9; i++) {
 			for (int j = 0; j < 9; j++) {
 				if (tiles[i][j].getKind() != Const.NONE) {
