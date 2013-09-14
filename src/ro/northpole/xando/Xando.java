@@ -146,13 +146,13 @@ public class Xando extends ZoomActivity {
 
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
-				Box b = bigTile(i, j, Const.X, Tile.DEFAULT_X_3);
-				mScene.attachChild(b);
-				miniBoardX[i][j] = b;
+				Box bX = bigTile(i, j, Const.X, Tile.DEFAULT_X_3);
+				mScene.attachChild(bX);
+				miniBoardX[i][j] = bX;
 
-				Box b2 = bigTile(i, j, Const.O, Tile.DEFAULT_Y_3);
-				mScene.attachChild(b2);
-				miniBoardO[i][j] = b2;
+				Box bY = bigTile(i, j, Const.O, Tile.DEFAULT_Y_3);
+				mScene.attachChild(bY);
+				miniBoardO[i][j] = bY;
 			}
 		}
 

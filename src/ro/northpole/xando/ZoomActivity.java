@@ -43,45 +43,31 @@ public class ZoomActivity extends SimpleBaseGameActivity implements
 	@Override
 	public void onScrollStarted(final ScrollDetector pScollDetector,
 			final int pPointerID, final float pDistanceX, final float pDistanceY) {
-		final float zoomFactor = mZoomCamera.getZoomFactor();
-		mZoomCamera.offsetCenter(-pDistanceX / zoomFactor, -pDistanceY
-				/ zoomFactor);
 	}
 
 	@Override
 	public void onScroll(final ScrollDetector pScollDetector,
 			final int pPointerID, final float pDistanceX, final float pDistanceY) {
-		final float zoomFactor = mZoomCamera.getZoomFactor();
-		mZoomCamera.offsetCenter(-pDistanceX / zoomFactor, -pDistanceY
-				/ zoomFactor);
 	}
 
 	@Override
 	public void onScrollFinished(final ScrollDetector pScollDetector,
 			final int pPointerID, final float pDistanceX, final float pDistanceY) {
-		final float zoomFactor = mZoomCamera.getZoomFactor();
-		mZoomCamera.offsetCenter(-pDistanceX / zoomFactor, -pDistanceY
-				/ zoomFactor);
 	}
 
 	@Override
 	public void onPinchZoomStarted(final PinchZoomDetector pPinchZoomDetector,
 			final TouchEvent pTouchEvent) {
-		mPinchZoomStartedCameraZoomFactor = mZoomCamera.getZoomFactor();
 	}
 
 	@Override
 	public void onPinchZoom(final PinchZoomDetector pPinchZoomDetector,
 			final TouchEvent pTouchEvent, final float pZoomFactor) {
-		mZoomCamera.setZoomFactor(mPinchZoomStartedCameraZoomFactor
-				* pZoomFactor);
 	}
 
 	@Override
 	public void onPinchZoomFinished(final PinchZoomDetector pPinchZoomDetector,
 			final TouchEvent pTouchEvent, final float pZoomFactor) {
-		mZoomCamera.setZoomFactor(mPinchZoomStartedCameraZoomFactor
-				* pZoomFactor);
 	}
 
 	@Override
