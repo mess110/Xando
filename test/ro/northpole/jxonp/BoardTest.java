@@ -6,7 +6,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.northpole.jnorthpole.util.Util;
 import ro.northpole.jxonp.exceptions.CanNotMoveThere;
 import ro.northpole.jxonp.exceptions.InvalidBoardCoordinates;
 import ro.northpole.jxonp.exceptions.JXoNpException;
@@ -14,6 +13,7 @@ import ro.northpole.jxonp.exceptions.NotYourTurn;
 import ro.northpole.jxonp.models.Board;
 import ro.northpole.jxonp.models.Move;
 import ro.northpole.jxonp.util.Const;
+import ro.northpole.jxonp.util.Util;
 
 public class BoardTest {
 

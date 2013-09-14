@@ -25,13 +25,10 @@ import ro.northpole.jxonp.util.Const;
 import ro.northpole.xando.models.AllowedMask;
 import ro.northpole.xando.models.Box;
 import ro.northpole.xando.models.Tile;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.EditText;
 import android.widget.Toast;
 
 public class Xando extends ZoomActivity {
@@ -198,41 +195,12 @@ public class Xando extends ZoomActivity {
 				}
 			});
 			return true;
-		case R.id.name:
-			nameAlertDialog();
-			return true;
 		case R.id.exit:
 			finish();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
-	}
-
-	private void nameAlertDialog() {
-		AlertDialog.Builder alert = new AlertDialog.Builder(this);
-
-		alert.setTitle(getString(R.string.alert_tile));
-		alert.setMessage(getString(R.string.alert_message));
-
-		final EditText input = new EditText(this);
-		alert.setView(input);
-
-		alert.setPositiveButton(getString(R.string.yes),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						String value = input.getText().toString();
-						Log.d("kiki", value);
-					}
-				});
-
-		alert.setNegativeButton(getString(R.string.no),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-					}
-				});
-
-		alert.show();
 	}
 
 	private void resetBoard() {

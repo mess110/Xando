@@ -2,14 +2,11 @@ package ro.northpole.jxonp;
 
 import java.io.IOException;
 
-import ro.northpole.jnorthpole.util.Util;
 import ro.northpole.jxonp.exceptions.JXoNpException;
 import ro.northpole.jxonp.models.Game;
-import ro.northpole.jxonp.util.NPClient;
+import ro.northpole.jxonp.util.Util;
 
-import com.google.gson.JsonObject;
-
-public class NP extends NPClient {
+public class NP {
 
 	public static final String NAMESPACE = "namespace";
 	public static final String NAMESPACE_VALUE = "jnpxo";
@@ -27,44 +24,22 @@ public class NP extends NPClient {
 	private Game game;
 
 	public NP(boolean online) throws IOException {
-		super(online);
-		if (online) {
-			JsonObject jsonGame = newGame();
-			game = gson.fromJson(jsonGame, Game.class);
-		} else {
-			game = new Game();
-			game.setId("offline");
-		}
+		game = new Game();
+		game.setId("offline");
 	}
 
 	public NP(String id, boolean online) throws JXoNpException, IOException {
-		super(online);
-		if (online) {
-			JsonObject jsonGame = getGame(id);
-			game = gson.fromJson(jsonGame, Game.class);
-		} else {
-			game = new Game();
-			game.setId(id);
-		}
+		game = new Game();
+		game.setId(id);
 	}
 
 	public void join(String name) throws JXoNpException, IOException {
-		boolean joined = game.join(name);
-		if (online) {
-			if (joined) {
-				JsonObject jsonGame = updateGame(game);
-				game = gson.fromJson(jsonGame, Game.class);
-			}
-		}
+		game.join(name);
 	}
 
 	public void move(String name, int x, int y) throws JXoNpException,
 			IOException {
 		game.move(name, x, y, Util.getTime());
-		if (online) {
-			JsonObject jsonGame = updateGame(game);
-			game = gson.fromJson(jsonGame, Game.class);
-		}
 	}
 
 	public Game getGame() {

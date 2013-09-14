@@ -6,9 +6,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.northpole.jnorthpole.util.Util;
 import ro.northpole.jxonp.exceptions.JXoNpException;
 import ro.northpole.jxonp.models.Game;
+import ro.northpole.jxonp.util.Util;
 
 public class GameTest {
 

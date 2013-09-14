@@ -6,10 +6,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.northpole.jnorthpole.util.Util;
 import ro.northpole.jxonp.models.Move;
 import ro.northpole.jxonp.models.MoveList;
 import ro.northpole.jxonp.util.Const;
+import ro.northpole.jxonp.util.Util;
 
 public class MovesTest {
 
